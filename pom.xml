@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<<<<<<< HEAD
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -19,6 +20,23 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.0</version>
         <relativePath/>
+=======
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>forgery</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Forgery Detection</name>
+    <description>Spring Boot + PostgreSQL + OpenCV project</description>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.18</version>
+        <relativePath/> <!-- Lookup parent from Maven Central -->
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
     </parent>
 
     <properties>
@@ -26,16 +44,26 @@
     </properties>
 
     <dependencies>
+<<<<<<< HEAD
         <!-- Spring Boot Starters -->
+=======
+        <!-- Spring Boot Web (REST APIs, controllers) -->
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+<<<<<<< HEAD
+=======
+
+        <!-- Spring Boot JPA (Database + Hibernate) -->
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+<<<<<<< HEAD
         <!-- PostgreSQL -->
         <dependency>
     		<groupId>org.postgresql</groupId>
@@ -44,19 +72,40 @@
 		</dependency>
 
         <!-- OpenCV via Bytedeco -->
+=======
+        <!-- PostgreSQL JDBC Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- OpenCV (Java bindings via Bytedeco) -->
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>opencv-platform</artifactId>
             <version>4.10.0-1.5.11</version>
         </dependency>
 
+<<<<<<< HEAD
         <!-- File Upload -->
+=======
+        <!-- Spring Boot Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.4</version>
         </dependency>
 
+<<<<<<< HEAD
         <!-- Utilities -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -87,4 +136,29 @@
         </plugin>
     </plugins>
 	</build>
+=======
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot Plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Compiler Plugin (Java 11) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+>>>>>>> b181bcdf448de44a096ce0776f14a05262295b10
 </project>
