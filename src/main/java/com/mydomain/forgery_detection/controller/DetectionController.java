@@ -1,79 +1,54 @@
 package com.mydomain.forgery_detection.controller;
 
-import com.mydomain.forgery_detection.dto.*;
-import com.mydomain.forgery_detection.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.mydomain.forgery_detection.dto.ImageDetectionResult;
+import com.mydomain.forgery_detection.dto.VideoDetectionResult;
+import com.mydomain.forgery_detection.dto.SignatureVerificationResult;
+import com.mydomain.forgery_detection.service.ImageDetectionService;
+import com.mydomain.forgery_detection.service.VideoDetectionService;
+import com.mydomain.forgery_detection.service.SignatureVerificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 @RestController
-@RequestMapping("/api/v1/detect")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/detection")
 public class DetectionController {
 
-    @Autowired
-    private ImageDetectionService imageDetectionService;
+    private final ImageDetectionService imageDetectionService;
+    private final VideoDetectionService videoDetectionService;
+    private final SignatureVerificationService signatureVerificationService;
 
-    @Autowired
-    private VideoDetectionService videoDetectionService;
+    public DetectionController(
+            ImageDetectionService imageDetectionService,
+            VideoDetectionService videoDetectionService,
+            SignatureVerificationService signatureVerificationService) {
+        this.imageDetectionService = imageDetectionService;
+        this.videoDetectionService = videoDetectionService;
+        this.signatureVerificationService = signatureVerificationService;
+    }
 
-    @Autowired
-    private SignatureVerificationService signatureVerificationService;
-
-    @Autowired
-    private DataSource dataSource; // Add DataSource for database connection
-
+    // 🔹 Image detection endpoint
     @PostMapping("/image")
-    public ResponseEntity<ApiResponse<ImageDetectionResult>> detectImageForgery(
+    public ResponseEntity<ImageDetectionResult> analyzeImage(
             @RequestParam("file") MultipartFile file) {
-        try {
-            ImageDetectionResult result = imageDetectionService.analyzeImage(file);
-            return ResponseEntity.ok(ApiResponse.success("Image analyzed successfully", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Error analyzing image: " + e.getMessage()));
-        }
+        ImageDetectionResult result = imageDetectionService.analyzeImage(file);
+        return ResponseEntity.ok(result);
     }
 
+    // 🔹 Video detection endpoint
     @PostMapping("/video")
-    public ResponseEntity<ApiResponse<VideoDetectionResult>> detectVideoForgery(
-            @RequestParam("file") MultipartFile file) {
-        try {
-            VideoDetectionResult result = videoDetectionService.analyzeVideo(file);
-            return ResponseEntity.ok(ApiResponse.success("Video analyzed successfully", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Error analyzing video: " + e.getMessage()));
-        }
+    public ResponseEntity<VideoDetectionResult> analyzeVideo(
+            @RequestParam("file") MultipartFile videoFile) { // Use "file" to match frontend
+        VideoDetectionResult result = videoDetectionService.analyzeVideo(videoFile);
+        return ResponseEntity.ok(result);
     }
 
+    // 🔹 Signature verification endpoint
     @PostMapping("/signature")
-    public ResponseEntity<ApiResponse<SignatureVerificationResult>> verifySignature(
-            @RequestParam("reference") MultipartFile referenceFile,
-            @RequestParam("test") MultipartFile testFile) {
-        try {
-            SignatureVerificationResult result = signatureVerificationService.verifySignature(referenceFile, testFile);
-            return ResponseEntity.ok(ApiResponse.success("Signature verification completed", result));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Error verifying signature: " + e.getMessage()));
-        }
-    }
-
-    // New endpoint to check database connection
-    @GetMapping("/check-connection")
-    public ResponseEntity<String> checkConnection() {
-        try (Connection connection = dataSource.getConnection()) {
-            return ResponseEntity.ok("Database connection is successful!");
-        } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Database connection failed: " + e.getMessage());
-        }
+    public ResponseEntity<SignatureVerificationResult> verifySignature(
+            @RequestParam("referenceFile") MultipartFile referenceFile,
+            @RequestParam("testFile") MultipartFile testFile) {
+        SignatureVerificationResult result = signatureVerificationService.verifySignature(referenceFile, testFile);
+        return ResponseEntity.ok(result);
     }
 }

@@ -1,18 +1,57 @@
 package com.mydomain.forgery_detection.dto;
 
 public class VideoDetectionResult extends DetectionResult {
-    private int totalFrames;
-    private int analyzedFrames;
     private double frameConsistencyScore;
-    private double audioVisualSyncScore;
+    private double motionAnomaliesScore;
+    private double audioVideoSyncScore;
 
-    // Getters and Setters
-    public int getTotalFrames() { return totalFrames; }
-    public void setTotalFrames(int totalFrames) { this.totalFrames = totalFrames; }
-    public int getAnalyzedFrames() { return analyzedFrames; }
-    public void setAnalyzedFrames(int analyzedFrames) { this.analyzedFrames = analyzedFrames; }
-    public double getFrameConsistencyScore() { return frameConsistencyScore; }
-    public void setFrameConsistencyScore(double frameConsistencyScore) { this.frameConsistencyScore = frameConsistencyScore; }
-    public double getAudioVisualSyncScore() { return audioVisualSyncScore; }
-    public void setAudioVisualSyncScore(double audioVisualSyncScore) { this.audioVisualSyncScore = audioVisualSyncScore; }
+    public VideoDetectionResult() {
+        // Default constructor
+    }
+
+    public VideoDetectionResult(String fileName, boolean likelyGenuine, double forgeryProbability) {
+        setFileName(fileName);
+        setLikelyGenuine(likelyGenuine);
+        setForgeryProbability(forgeryProbability);
+    }
+
+    // Getters and setters
+    public double getFrameConsistencyScore() {
+        return frameConsistencyScore;
+    }
+
+    public void setFrameConsistencyScore(double frameConsistencyScore) {
+        this.frameConsistencyScore = frameConsistencyScore;
+    }
+
+    public double getMotionAnomaliesScore() {
+        return motionAnomaliesScore;
+    }
+
+    public void setMotionAnomaliesScore(double motionAnomaliesScore) {
+        this.motionAnomaliesScore = motionAnomaliesScore;
+    }
+
+    public double getAudioVideoSyncScore() {
+        return audioVideoSyncScore;
+    }
+
+    public void setAudioVideoSyncScore(double audioVideoSyncScore) {
+        this.audioVideoSyncScore = audioVideoSyncScore;
+    }
+
+    // Optional: helpful for logging and debugging
+    @Override
+    public String toString() {
+        return "VideoDetectionResult{" +
+                "fileName='" + getFileName() + '\'' +
+                ", frameConsistencyScore=" + frameConsistencyScore +
+                ", motionAnomaliesScore=" + motionAnomaliesScore +
+                ", audioVideoSyncScore=" + audioVideoSyncScore +
+                ", forgeryProbability=" + getForgeryProbability() +
+                ", decision='" + getDecision() + '\'' +
+                ", likelyGenuine=" + isLikelyGenuine() +
+                ", processingTimeMs=" + getProcessingTimeMs() +
+                '}';
+    }
 }

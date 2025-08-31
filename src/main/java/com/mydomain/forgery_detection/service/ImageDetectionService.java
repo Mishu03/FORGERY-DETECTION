@@ -1,128 +1,130 @@
 package com.mydomain.forgery_detection.service;
 
 import com.mydomain.forgery_detection.dto.ImageDetectionResult;
-import org.opencv.core.*;
+import com.mydomain.forgery_detection.service.analyzer.ElaAnalyzer;
+import com.mydomain.forgery_detection.service.analyzer.MetadataAnalyzer;
+import com.mydomain.forgery_detection.service.analyzer.NoiseAnalyzer;
+import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Base64;
 
 @Service
 public class ImageDetectionService {
 
-    public ImageDetectionResult analyzeImage(MultipartFile imageFile) {
+    private static final Logger logger = LoggerFactory.getLogger(ImageDetectionService.class);
+
+    private final ElaAnalyzer elaAnalyzer;
+    private final NoiseAnalyzer noiseAnalyzer;
+    private final MetadataAnalyzer metadataAnalyzer;
+
+    @Value("${forgery.threshold.genuine:0.3}")
+    private double genuineThreshold;
+
+    @Value("${forgery.threshold.suspicious:0.7}")
+    private double suspiciousThreshold;
+
+    public ImageDetectionService(ElaAnalyzer elaAnalyzer,
+                                 NoiseAnalyzer noiseAnalyzer,
+                                 MetadataAnalyzer metadataAnalyzer) {
+        this.elaAnalyzer = elaAnalyzer;
+        this.noiseAnalyzer = noiseAnalyzer;
+        this.metadataAnalyzer = metadataAnalyzer;
+    }
+
+    public ImageDetectionResult analyzeImage(MultipartFile file) {
         ImageDetectionResult result = new ImageDetectionResult();
-        long startTime = System.currentTimeMillis();
+        result.setFileName(file.getOriginalFilename());
+        result.setDetectionType("IMAGE");
+        long start = System.currentTimeMillis();
 
         try {
-            // Save temporary file
-            Path tempFile = Files.createTempFile("image-", ".tmp");
-            Files.copy(imageFile.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+            // Create temporary file
+            File tempFile = File.createTempFile("upload-", ".tmp");
+            file.transferTo(tempFile);
+            logger.debug("Temporary file created at: {}", tempFile.getAbsolutePath());
 
-            // Load image
-            Mat image = Imgcodecs.imread(tempFile.toString());
-            if (image.empty()) {
-                throw new RuntimeException("Failed to load image");
+            // Read image
+            Mat img = Imgcodecs.imread(tempFile.getAbsolutePath(), Imgcodecs.IMREAD_COLOR);
+
+            if (img.empty()) {
+                result.setErrorMessage("Could not decode image");
+                result.setForgeryProbability(0);
+                result.setDecision("Unknown");
+                result.setLikelyGenuine(false);
+                logger.warn("Image could not be read: {}", file.getOriginalFilename());
+            } else {
+                // ----- ANALYSIS -----
+                double elaScore = elaAnalyzer.analyze(img);            // 0-1, higher → more genuine
+                double noiseScore = noiseAnalyzer.analyze(img);        // 0-1, higher → suspicious
+                double metadataScore = metadataAnalyzer.analyze(file); // 0-1, higher → consistent
+                double similarityScore = computeStructuralSimilarity(img); // 0-1, higher → similar
+
+                // Log analyzer outputs
+                logger.debug("Analyzer Scores -> ELA: {}, Noise: {}, Metadata: {}, Similarity: {}",
+                        elaScore, noiseScore, metadataScore, similarityScore);
+
+                // ----- FORGERY PROBABILITY -----
+                double forgeryProbability =
+                        0.4 * (1 - elaScore) +
+                        0.3 * noiseScore +
+                        0.2 * (1 - metadataScore) +
+                        0.1 * (1 - similarityScore);
+
+                // Optional: non-linear amplification
+                forgeryProbability = Math.min(1.0, Math.pow(forgeryProbability, 1.2));
+
+                // ----- DECISION -----
+                String decision = forgeryProbability < genuineThreshold ? "Likely Genuine" :
+                                  forgeryProbability < suspiciousThreshold ? "Suspicious" : "Likely Forged";
+
+                logger.info("Decision: {}, Forgery Probability: {}", decision, forgeryProbability);
+
+                // ----- ELA HEATMAP -----
+                BufferedImage heatmap = elaAnalyzer.generateElaHeatmap(img);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(heatmap, "png", baos);
+                String base64 = Base64.getEncoder().encodeToString(baos.toByteArray());
+
+                // ----- POPULATE RESULT -----
+                result.setElaScore(elaScore);
+                result.setNoiseAnalysisScore(noiseScore);
+                result.setMetadataConsistencyScore(metadataScore);
+                result.setSimilarityScore(similarityScore);
+                result.setForgeryProbability(forgeryProbability);
+                result.setDecision(decision);
+                result.setLikelyGenuine(decision.equals("Likely Genuine"));
+                result.setElaHeatmapBase64(base64);
             }
 
-            // Perform various analyses
-            double elaScore = performELAAnalysis(image);
-            double noiseScore = performNoiseAnalysis(image);
-            double metadataScore = 0.8; // Placeholder for metadata analysis
-
-            // Calculate overall similarity score
-            double similarityScore = (elaScore * 0.4) + (noiseScore * 0.4) + (metadataScore * 0.2);
-
-            result.setFileName(imageFile.getOriginalFilename());
-            result.setElaScore(elaScore);
-            result.setNoiseAnalysisScore(noiseScore);
-            result.setMetadataConsistencyScore(metadataScore);
-            result.setSimilarityScore(similarityScore);
-            result.setLikelyGenuine(similarityScore >= 0.7);
-            result.setProcessingTimeMs(System.currentTimeMillis() - startTime);
-
-            // Cleanup
-            Files.deleteIfExists(tempFile);
-
-        } catch (IOException e) {
-            result.setErrorMessage("File processing error: " + e.getMessage());
+            tempFile.delete();
         } catch (Exception e) {
-            result.setErrorMessage("Analysis error: " + e.getMessage());
+            result.setErrorMessage("Unexpected error: " + e.getMessage());
+            result.setForgeryProbability(0);
+            result.setDecision("Unknown");
+            result.setLikelyGenuine(false);
+            logger.error("Error analyzing image: {}", file.getOriginalFilename(), e);
         }
 
+        result.setProcessingTimeMs(System.currentTimeMillis() - start);
+        logger.debug("Processing time: {} ms", result.getProcessingTimeMs());
         return result;
     }
 
-    private double performELAAnalysis(Mat image) {
-        try {
-            // Convert to grayscale
-            Mat gray = new Mat();
-            Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
-            
-            // Save original as JPEG with quality 90
-            MatOfInt params = new MatOfInt(
-                Imgcodecs.IMWRITE_JPEG_QUALITY, 90
-            );
-            Imgcodecs.imwrite("temp_original.jpg", gray, params);
-            
-            // Reload the compressed image
-            Mat compressed = Imgcodecs.imread("temp_original.jpg", Imgcodecs.IMREAD_GRAYSCALE);
-            
-            // Calculate difference (ELA)
-            Mat diff = new Mat();
-            Core.absdiff(gray, compressed, diff);
-            
-            // Calculate mean difference as score (normalized)
-            Scalar meanDiff = Core.mean(diff);
-            double elaScore = 1.0 - (meanDiff.val[0] / 255.0);
-            
-            // Cleanup
-            gray.release();
-            compressed.release();
-            diff.release();
-            
-            return Math.max(0, Math.min(1.0, elaScore));
-            
-        } catch (Exception e) {
-            return 0.5; // Default score if analysis fails
-        }
-    }
-
-    private double performNoiseAnalysis(Mat image) {
-        try {
-            // Convert to grayscale
-            Mat gray = new Mat();
-            Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
-            
-            // Apply Gaussian blur
-            Mat blurred = new Mat();
-            Imgproc.GaussianBlur(gray, blurred, new Size(5, 5), 0);
-            
-            // Calculate difference
-            Mat diff = new Mat();
-            Core.absdiff(gray, blurred, diff);
-            
-            // Calculate noise level
-            Scalar meanNoise = Core.mean(diff);
-            double noiseLevel = meanNoise.val[0] / 255.0;
-            
-            // Higher noise might indicate tampering
-            double noiseScore = 1.0 - noiseLevel;
-            
-            // Cleanup
-            gray.release();
-            blurred.release();
-            diff.release();
-            
-            return Math.max(0, Math.min(1.0, noiseScore));
-            
-        } catch (Exception e) {
-            return 0.5;
-        }
+    /**
+     * Placeholder for actual structural similarity computation.
+     * Replace with real comparison algorithm.
+     */
+    private double computeStructuralSimilarity(Mat img) {
+        // TODO: implement real structural similarity metric
+        return 0.5; // placeholder
     }
 }

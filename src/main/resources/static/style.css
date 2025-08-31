@@ -1,0 +1,393 @@
+/* =========================
+   Base Reset & Typography
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  background: #fafafa;
+  color: #333;
+}
+
+/* =========================
+   Container
+========================= */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* =========================
+   Navbar
+========================= */
+.nav {
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #444;
+  text-decoration: none;
+}
+
+.brand__icon {
+  color: #9c88ff;
+}
+
+.nav__links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav__links a {
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav__links a:hover {
+  color: #9c88ff;
+}
+
+/* =========================
+   Hero
+========================= */
+.hero {
+  background: linear-gradient(145deg, #fdfbff, #f8faff);
+  text-align: center;
+  padding: 5rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.hero__inner h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.hero__inner p {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  color: #666;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* =========================
+   Sections
+========================= */
+.section {
+  padding: 4rem 1rem;
+}
+
+.section__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section__header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.section__header p {
+  color: #777;
+}
+
+/* =========================
+   Grid Layout
+========================= */
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* =========================
+   Cards
+========================= */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  color: #444;
+}
+
+.card--soft {
+  background: #fdfbff;
+  border: 1px solid #eee;
+}
+
+/* =========================
+   Dropzone
+========================= */
+.dropzone {
+  border: 2px dashed #d0c4ff;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  background: #faf9ff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.dropzone:hover {
+  border-color: #9c88ff;
+  background: #f5f2ff;
+}
+
+.dropzone i {
+  font-size: 2rem;
+  color: #afa0fb;
+  margin-bottom: 0.5rem;
+}
+
+.dropzone p {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.file-input {
+  display: none;
+}
+
+/* =========================
+   Preview
+========================= */
+.preview {
+  margin-top: 1rem;
+  max-width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.preview--short img {
+  max-height: 120px;
+  object-fit: contain;
+}
+
+/* =========================
+   Placeholder / Results
+========================= */
+.placeholder {
+  color: #aaa;
+  text-align: center;
+}
+
+.placeholder i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #ddd;
+}
+
+.mirror {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   Buttons
+========================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+.btn--primary {
+  background: #9c88ff;
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: #7f6df7;
+}
+
+.btn--wide {
+  width: 100%;
+  justify-content: center;
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   Footer
+========================= */
+.footer {
+  background: #ffffff;
+  border-top: 1px solid #eee;
+  padding: 2rem 1rem;
+  margin-top: 3rem;
+}
+
+.footer__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.footer__brand {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.footer__brand h4 {
+  margin-bottom: 0.25rem;
+}
+
+.footer__links {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer__links a {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer__links a:hover {
+  color: #9c88ff;
+}
+
+.footer__copy {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* =========================
+   Loading Spinners & Animation
+========================= */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.placeholder i.fa-spin {
+  animation: spin 1s linear infinite;
+  color: #9c88ff;
+}
+
+/* =========================
+   Preview Gradient Overlay
+========================= */
+.preview::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(156,136,255,0.1), rgba(156,136,255,0.2), rgba(156,136,255,0.1));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.preview.loading::before {
+  opacity: 1;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* =========================
+   Card Hover Glow
+========================= */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(156, 136, 255, 0.2);
+}
+
+/* =========================
+   Smooth File Upload Animation
+========================= */
+.dropzone.dragover {
+  border-color: #9c88ff;
+  background: #f5f2ff;
+  box-shadow: 0 8px 20px rgba(156,136,255,0.15);
+}

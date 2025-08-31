@@ -1,107 +1,103 @@
 package com.mydomain.forgery_detection.service;
 
 import com.mydomain.forgery_detection.dto.VideoDetectionResult;
-import org.opencv.core.Mat;
-import org.opencv.core.Core;
-import org.opencv.core.MatOfDouble;
+import com.mydomain.forgery_detection.service.analyzer.FrameConsistencyAnalyzer;
+import com.mydomain.forgery_detection.service.analyzer.MotionAnomaliesAnalyzer;
+import com.mydomain.forgery_detection.service.analyzer.AudioVideoSyncAnalyzer;
+import org.springframework.web.multipart.MultipartFile;
 import org.opencv.videoio.VideoCapture;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.io.File;
 
 @Service
 public class VideoDetectionService {
 
-    public VideoDetectionResult analyzeVideo(MultipartFile videoFile) {
+    private final FrameConsistencyAnalyzer frameAnalyzer;
+    private final MotionAnomaliesAnalyzer motionAnalyzer;
+    private final AudioVideoSyncAnalyzer avSyncAnalyzer;
+
+    public VideoDetectionService(FrameConsistencyAnalyzer frameAnalyzer,
+                                 MotionAnomaliesAnalyzer motionAnalyzer,
+                                 AudioVideoSyncAnalyzer avSyncAnalyzer) {
+        this.frameAnalyzer = frameAnalyzer;
+        this.motionAnalyzer = motionAnalyzer;
+        this.avSyncAnalyzer = avSyncAnalyzer;
+    }
+
+    public VideoDetectionResult analyzeVideo(MultipartFile file) {
         VideoDetectionResult result = new VideoDetectionResult();
-        long startTime = System.currentTimeMillis();
+        result.setFileName(file != null ? file.getOriginalFilename() : "unknown");
+        result.setDetectionType("VIDEO");
+        long start = System.currentTimeMillis();
+
+        File tempVideo = null;
+        VideoCapture capture = null;
 
         try {
-            Path tempFile = Files.createTempFile("video-", ".mp4");
-            Files.copy(videoFile.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+            // Save temporary video file
+            tempVideo = File.createTempFile("video-", ".mp4");
+            if (file != null) file.transferTo(tempVideo);
 
-            VideoCapture capture = new VideoCapture(tempFile.toString());
+            System.out.println("Temp video saved at: " + tempVideo.getAbsolutePath());
+
+            // ----- FRAME CONSISTENCY -----
+            capture = new VideoCapture(tempVideo.getAbsolutePath());
             if (!capture.isOpened()) {
-                throw new RuntimeException("Failed to open video file");
+                result.setErrorMessage("Failed to open video file");
+                result.setForgeryProbability(0);
+                result.setDecision("Unknown");
+                result.setLikelyGenuine(false);
+                return result;
             }
 
-            int totalFrames = (int) capture.get(7); // CAP_PROP_FRAME_COUNT
-            int analyzedFrames = 0;
-            double totalFrameScore = 0.0;
-
-            Mat frame = new Mat();
-            while (capture.read(frame) && analyzedFrames < 100) { // Analyze first 100 frames
-                if (!frame.empty()) {
-                    double frameScore = analyzeVideoFrame(frame);
-                    totalFrameScore += frameScore;
-                    analyzedFrames++;
-                }
-                frame.release();
-            }
-
-            double averageFrameScore = analyzedFrames > 0 ? totalFrameScore / analyzedFrames : 0.0;
-            double consistencyScore = calculateConsistencyScore(totalFrameScore, analyzedFrames);
-
-            result.setFileName(videoFile.getOriginalFilename());
-            result.setTotalFrames(totalFrames);
-            result.setAnalyzedFrames(analyzedFrames);
-            result.setFrameConsistencyScore(consistencyScore);
-            result.setAudioVisualSyncScore(0.8); // Placeholder
-            result.setSimilarityScore(averageFrameScore);
-            result.setLikelyGenuine(averageFrameScore >= 0.6);
-            result.setProcessingTimeMs(System.currentTimeMillis() - startTime);
-
+            double frameConsistency = frameAnalyzer.analyze(capture);
+            System.out.println("Frame Consistency Score: " + frameConsistency);
             capture.release();
-            Files.deleteIfExists(tempFile);
 
-        } catch (IOException e) {
-            result.setErrorMessage("File processing error: " + e.getMessage());
+            // ----- MOTION ANOMALIES -----
+            double motionAnomalies = motionAnalyzer.analyze(tempVideo);
+            System.out.println("Motion Anomalies Score: " + motionAnomalies);
+
+            // ----- AUDIO-VIDEO SYNC -----
+            double avSyncScore = avSyncAnalyzer.analyze(tempVideo);
+            System.out.println("Audio-Video Sync Score: " + avSyncScore);
+
+            // ----- NORMALIZE & PROBABILITY -----
+            double normalizedFrame = frameConsistency;       // 0-1, higher = better
+            double normalizedMotion = 1 - motionAnomalies;   // 0-1, higher = better
+            double normalizedAVSync = avSyncScore;           // 0-1, higher = better
+
+            double forgeryProbability = 1 - ((normalizedFrame + normalizedMotion + normalizedAVSync) / 3.0);
+            forgeryProbability = Math.min(1.0, Math.max(0.0, forgeryProbability));
+            System.out.println("Calculated Forgery Probability: " + forgeryProbability);
+
+            // ----- DECISION -----
+            String decision = forgeryProbability < 0.3 ? "Likely Genuine" :
+                              forgeryProbability < 0.7 ? "Suspicious" : "Likely Forged";
+            System.out.println("Decision: " + decision);
+
+            // ----- POPULATE RESULT -----
+            result.setFrameConsistencyScore(frameConsistency);
+            result.setMotionAnomaliesScore(motionAnomalies);
+            result.setAudioVideoSyncScore(avSyncScore);
+            result.setForgeryProbability(forgeryProbability);
+            result.setDecision(decision);
+            result.setLikelyGenuine(decision.equals("Likely Genuine"));
+
         } catch (Exception e) {
-            result.setErrorMessage("Analysis error: " + e.getMessage());
+            e.printStackTrace();
+            result.setErrorMessage("Unexpected error: " + e.getMessage());
+            result.setForgeryProbability(0);
+            result.setDecision("Unknown");
+            result.setLikelyGenuine(false);
+        } finally {
+            if (capture != null && capture.isOpened()) capture.release();
+            if (tempVideo != null && tempVideo.exists()) tempVideo.delete();
         }
 
+        result.setProcessingTimeMs(System.currentTimeMillis() - start);
+        System.out.println("Processing Time (ms): " + result.getProcessingTimeMs());
         return result;
-    }
-
-    private double analyzeVideoFrame(Mat frame) {
-        // Basic frame analysis - can be enhanced with more sophisticated algorithms
-        try {
-            // Simple analysis: check frame quality and consistency
-            double brightness = Core.mean(frame).val[0] / 255.0;
-            double contrast = calculateContrast(frame);
-            
-            // Combined score (simple heuristic)
-            return (brightness * 0.5 + contrast * 0.5);
-            
-        } catch (Exception e) {
-            return 0.5;
-        }
-    }
-
-    private double calculateContrast(Mat frame) {
-        // Simple contrast calculation
-        Mat gray = new Mat();
-        org.opencv.imgproc.Imgproc.cvtColor(frame, gray, org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY);
-        
-        MatOfDouble mean = new MatOfDouble();
-        MatOfDouble stddev = new MatOfDouble();
-        Core.meanStdDev(gray, mean, stddev);
-        
-        double contrast = stddev.get(0, 0)[0] / 255.0;
-        gray.release();
-        
-        return Math.min(1.0, contrast);
-    }
-
-    private double calculateConsistencyScore(double totalScore, int frameCount) {
-        if (frameCount == 0) return 0.0;
-        
-        // Simple consistency metric (higher is better)
-        double average = totalScore / frameCount;
-        return Math.min(1.0, average * 1.2); // Scale slightly for better results
     }
 }

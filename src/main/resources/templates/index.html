@@ -1,465 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forensic Forgery Detection System</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Forensic Forgery Detection</title>
+
+    <!-- Icons -->
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css}" rel="stylesheet" />
+
+    <!-- Styles (external) -->
+    <link th:href="@{/style.css}" rel="stylesheet" />
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-fingerprint"></i>
-                    </div>
-                    <h1>Forensic Forgery Detection</h1>
-                </div>
-                <nav class="navigation">
-                    <a href="#image-detection">Image Analysis</a>
-                    <a href="#video-detection">Video Analysis</a>
-                    <a href="#signature-verification">Signature Verification</a>
-                </nav>
-            </div>
+    <!-- =================== NAVBAR =================== -->
+    <header class="nav">
+        <div class="container nav__inner">
+            <a class="brand" href="#">
+                <span class="brand__icon"><i class="fa-solid fa-fingerprint"></i></span>
+                <span class="brand__text">Forensic Forgery Detection</span>
+            </a>
+            <nav class="nav__links" aria-label="Primary">
+                <a href="#image-detection">Images</a>
+                <a href="#video-detection">Videos</a>
+                <a href="#signature-verification">Signatures</a>
+                <a href="#results">Results</a>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- =================== HERO =================== -->
     <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Advanced Digital Forensics Analysis</h2>
-                <p>Detect forgeries in images, videos, and signatures using cutting-edge computer vision technology</p>
-                <div class="hero-buttons">
-                    <a href="#image-detection" class="btn btn-primary">
-                        <i class="fas fa-image"></i>Analyze Images
-                    </a>
-                    <a href="#video-detection" class="btn btn-primary">
-                        <i class="fas fa-video"></i>Analyze Videos
-                    </a>
-                    <a href="#signature-verification" class="btn btn-primary">
-                        <i class="fas fa-signature"></i>Verify Signatures
-                    </a>
-                </div>
+        <div class="container hero__inner">
+            <h1>Advanced Digital Forensics</h1>
+            <p>Detect forgeries in images, videos, and signatures using computer vision and signal analysis.</p>
+            <div class="hero__actions">
+                <a class="btn btn--primary" href="#image-detection"><i class="fa-regular fa-image"></i> Analyze Images</a>
+                <a class="btn btn--primary" href="#video-detection"><i class="fa-solid fa-video"></i> Analyze Videos</a>
+                <a class="btn btn--primary" href="#signature-verification"><i class="fa-solid fa-signature"></i> Verify Signatures</a>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Image Detection Section -->
-        <section id="image-detection" class="section">
-            <div class="section-header">
-                <h2>Image Forgery Detection</h2>
-                <p>Upload images to detect manipulations, edits, or forgeries using advanced error level analysis and computer vision techniques</p>
-            </div>
+    <main>
+        <!-- =================== IMAGE SECTION =================== -->
+<section id="image-detection" class="section">
+    <div class="container">
+        <header class="section__header">
+            <h2>Image Forgery Detection</h2>
+            <p>ELA, noise, and metadata analysis to surface manipulations.</p>
+        </header>
 
-            <div class="image-grid">
-                <div class="card">
-                    <h3>Upload Image</h3>
-                    <div class="upload-area">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Drag & drop your image here or click to browse</p>
-                        <input type="file" id="imageFile" accept="image/*" class="file-input">
-                        <label for="imageFile" class="upload-btn">
-                            <i class="fas fa-upload"></i>Select Image
-                        </label>
-                        <p class="file-size">Max file size: 100MB</p>
-                    </div>
-                    <div id="imagePreview" class="preview-container">
-                        <img src="" alt="Selected image for forgery analysis">
-                    </div>
-                    <button onclick="analyzeImage()" class="analyze-btn">
-                        <i class="fas fa-search"></i>Analyze Image
-                    </button>
+        <div class="grid grid--2">
+            <article class="card">
+                <h3>Upload Image</h3>
+                <div class="dropzone" data-for="imageFile" tabindex="0" role="button" aria-label="Upload image via drag and drop or click">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>Drag & drop an image here, or click to browse</p>
+                    <p class="hint">Max 100MB • PNG, JPG, JPEG</p>
+                    <input id="imageFile" class="file-input" type="file" accept="image/*" />
                 </div>
 
-                <div class="card">
-                    <h3>Analysis Results</h3>
-                    <div id="imageResults" class="results-placeholder">
-                        <i class="fas fa-microscope"></i>
-                        <p>Upload an image to begin analysis</p>
-                    </div>
+                <div id="imagePreview" class="preview hidden" aria-live="polite"></div>
+
+                <button class="btn btn--wide" id="analyzeImageBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Analyze Image
+                </button>
+            </article>
+
+            <article class="card">
+                <h3>Analysis Results</h3>
+                <div id="imageResults" class="placeholder" aria-live="polite">
+                    <i class="fa-solid fa-microscope"></i>
+                    <p>Upload an image to begin analysis.</p>
                 </div>
-            </div>
-        </section>
+            </article>
+        </div>
+    </div>
+</section>
 
-        <!-- Video Detection Section -->
-        <section id="video-detection" class="section">
-            <div class="section-header">
-                <h2>Video Forgery Detection</h2>
-                <p>Analyze video files for tampering, deepfakes, or other manipulations using frame-by-frame analysis</p>
-            </div>
+<!-- =================== VIDEO SECTION =================== -->
+<section id="video-detection" class="section">
+    <div class="container">
+        <header class="section__header">
+            <h2>Video Forgery Detection</h2>
+            <p>Frame consistency, motion anomalies, and A/V sync checks.</p>
+        </header>
 
-            <div class="image-grid">
-                <div class="card">
-                    <h3>Upload Video</h3>
-                    <div class="upload-area">
-                        <i class="fas fa-video"></i>
-                        <p>Select a video file for analysis</p>
-                        <input type="file" id="videoFile" accept="video/*" class="file-input">
-                        <label for="videoFile" class="upload-btn video-btn">
-                            <i class="fas fa-upload"></i>Select Video
-                        </label>
-                        <p class="file-size">Max file size: 100MB</p>
-                    </div>
-                    <button onclick="analyzeVideo()" class="analyze-btn video-btn">
-                        <i class="fas fa-search"></i>Analyze Video
-                    </button>
-                </div>
-
-                <div class="card">
-                    <h3>Video Analysis Results</h3>
-                    <div id="videoResults" class="results-placeholder">
-                        <i class="fas fa-film"></i>
-                        <p>Upload a video to begin analysis</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Signature Verification Section -->
-        <section id="signature-verification" class="section">
-            <div class="section-header">
-                <h2>Signature Verification</h2>
-                <p>Compare signatures to verify authenticity using advanced pattern recognition and similarity analysis</p>
-            </div>
-
-            <div class="signature-grid">
-                <div class="card">
-                    <h3>Reference Signature</h3>
-                    <div class="upload-area">
-                        <i class="fas fa-signature"></i>
-                        <p>Upload reference signature</p>
-                        <input type="file" id="referenceSignature" accept="image/*" class="file-input">
-                        <label for="referenceSignature" class="upload-btn signature-btn">
-                            <i class="fas fa-upload"></i>Select Reference
-                        </label>
-                    </div>
-                    <div id="referencePreview" class="preview-container signature-preview">
-                        <img src="" alt="Reference signature sample for comparison">
-                    </div>
+        <div class="grid grid--2">
+            <article class="card">
+                <h3>Upload Video</h3>
+                <div class="dropzone" data-for="videoFile" tabindex="0" role="button" aria-label="Upload video via drag and drop or click">
+                    <i class="fa-solid fa-video"></i>
+                    <p>Drag & drop a video here, or click to browse</p>
+                    <p class="hint">Max 100MB • MP4, MOV, AVI</p>
+                    <input id="videoFile" class="file-input" type="file" accept="video/*" />
                 </div>
 
-                <div class="card">
-                    <h3>Test Signature</h3>
-                    <div class="upload-area">
-                        <i class="fas fa-signature"></i>
-                        <p>Upload signature to verify</p>
-                        <input type="file" id="testSignature" accept="image/*" class="file-input">
-                        <label for="testSignature" class="upload-btn signature-test-btn">
-                            <i class="fas fa-upload"></i>Select Test
-                        </label>
-                    </div>
-                    <div id="testPreview" class="preview-container signature-preview">
-                        <img src="" alt="Test signature sample for verification analysis">
-                    </div>
-                </div>
+                <div id="videoPreview" class="preview hidden" aria-live="polite"></div>
 
-                <div class="card">
-                    <h3>Verification Results</h3>
-                    <button onclick="verifySignature()" class="analyze-btn signature-btn">
-                        <i class="fas fa-check-circle"></i>Verify Signature
-                    </button>
-                    <div id="signatureResults" class="results-placeholder">
-                        <i class="fas fa-signature"></i>
-                        <p>Upload both signatures to begin verification</p>
-                    </div>
+                <button class="btn btn--wide" id="analyzeVideoBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Analyze Video
+                </button>
+            </article>
+
+            <article class="card">
+                <h3>Video Results</h3>
+                <div id="videoResults" class="placeholder" aria-live="polite">
+                    <i class="fa-solid fa-film"></i>
+                    <p>Upload a video to begin analysis.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- =================== SIGNATURE SECTION =================== -->
+<section id="signature-verification" class="section">
+    <div class="container">
+        <header class="section__header">
+            <h2>Signature Verification</h2>
+            <p>Structural similarity, pressure patterns, and stroke consistency.</p>
+        </header>
+
+        <div class="grid grid--3">
+            <article class="card">
+                <h3>Reference Signature</h3>
+                <div class="dropzone" data-for="referenceSignature" tabindex="0" role="button" aria-label="Upload reference signature">
+                    <i class="fa-solid fa-signature"></i>
+                    <p>Drag & drop a reference signature, or click to browse</p>
+                    <input id="referenceSignature" class="file-input" type="file" accept="image/*" />
+                </div>
+                <div id="referencePreview" class="preview hidden" aria-live="polite"></div>
+            </article>
+
+            <article class="card">
+                <h3>Test Signature</h3>
+                <div class="dropzone" data-for="testSignature" tabindex="0" role="button" aria-label="Upload test signature">
+                    <i class="fa-solid fa-signature"></i>
+                    <p>Drag & drop a test signature, or click to browse</p>
+                    <input id="testSignature" class="file-input" type="file" accept="image/*" />
+                </div>
+                <div id="testPreview" class="preview hidden" aria-live="polite"></div>
+            </article>
+
+            <article class="card">
+                <h3>Verification</h3>
+                <button class="btn btn--wide" id="verifySignatureBtn">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Verify Signature
+                </button>
+                <div id="signatureResults" class="placeholder" aria-live="polite">
+                    <i class="fa-solid fa-signature"></i>
+                    <p>Upload both signatures to begin verification.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+        <!-- =================== RESULTS ANCHOR =================== -->
+        <section id="results" class="section section--tight">
+            <div class="container">
+                <header class="section__header">
+                    <h2>All Results</h2>
+                    <p>Scroll to any section to run another analysis.</p>
+                </header>
+
+                <div class="grid grid--3">
+                    <article class="card card--soft" aria-labelledby="res-image-title">
+                        <h3 id="res-image-title"><i class="fa-regular fa-image"></i> Latest Image Result</h3>
+                        <div id="imageResultsMirror" class="mirror"></div>
+                    </article>
+
+                    <article class="card card--soft" aria-labelledby="res-video-title">
+                        <h3 id="res-video-title"><i class="fa-solid fa-video"></i> Latest Video Result</h3>
+                        <div id="videoResultsMirror" class="mirror"></div>
+                    </article>
+
+                    <article class="card card--soft" aria-labelledby="res-sign-title">
+                        <h3 id="res-sign-title"><i class="fa-solid fa-signature"></i> Latest Signature Result</h3>
+                        <div id="signatureResultsMirror" class="mirror"></div>
+                    </article>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- =================== FOOTER =================== -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-section">
-                    <h3>Forensic Forgery Detection</h3>
-                    <p>Advanced digital forensics and authentication system powered by computer vision and machine learning.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#image-detection">Image Analysis</a></li>
-                        <li><a href="#video-detection">Video Analysis</a></li>
-                        <li><a href="#signature-verification">Signature Verification</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Technical Info</h4>
-                    <p>Powered by Spring Boot, OpenCV, and advanced computer vision algorithms.</p>
+        <div class="container footer__inner">
+            <div class="footer__brand">
+                <div class="brand__icon"><i class="fa-solid fa-fingerprint"></i></div>
+                <div>
+                    <h4>Forensic Forgery Detection</h4>
+                    <p>Powered by Spring Boot, OpenCV, and robust forensics pipelines.</p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Forensic Forgery Detection System. All rights reserved.</p>
+
+            <div class="footer__links">
+                <a href="#image-detection">Images</a>
+                <a href="#video-detection">Videos</a>
+                <a href="#signature-verification">Signatures</a>
             </div>
+
+            <p class="footer__copy">© 2024 Forensic Forgery Detection System. All rights reserved.</p>
         </div>
     </footer>
 
-    <script>
-        // File input handlers
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            handleFilePreview(e, 'imagePreview');
-        });
-
-        document.getElementById('videoFile').addEventListener('change', function(e) {
-            // Video preview logic can be added here
-        });
-
-        document.getElementById('referenceSignature').addEventListener('change', function(e) {
-            handleFilePreview(e, 'referencePreview');
-        });
-
-        document.getElementById('testSignature').addEventListener('change', function(e) {
-            handleFilePreview(e, 'testPreview');
-        });
-
-        function handleFilePreview(event, previewId) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById(previewId);
-                    const img = preview.querySelector('img') || document.createElement('img');
-                    img.src = e.target.result;
-                    img.alt = file.name;
-                    preview.appendChild(img);
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // API Base URL - Update this to match your backend URL
-        const API_BASE_URL = 'http://localhost:8080/api/v1/detect';
-
-        // Analysis functions
-        async function analyzeImage() {
-            const fileInput = document.getElementById('imageFile');
-            const resultsDiv = document.getElementById('imageResults');
-            
-            if (!fileInput.files[0]) {
-                showError(resultsDiv, 'Please select an image file first');
-                return;
-            }
-
-            showLoading(resultsDiv, 'Analyzing image for forgeries...');
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/image`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    showImageResults(resultsDiv, data.data);
-                } else {
-                    showError(resultsDiv, data.message);
-                }
-            } catch (error) {
-                showError(resultsDiv, 'Error connecting to the server. Please try again.');
-            }
-        }
-
-        async function analyzeVideo() {
-            const fileInput = document.getElementById('videoFile');
-            const resultsDiv = document.getElementById('videoResults');
-            
-            if (!fileInput.files[0]) {
-                showError(resultsDiv, 'Please select a video file first');
-                return;
-            }
-
-            showLoading(resultsDiv, 'Analyzing video for manipulations...');
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/video`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    showVideoResults(resultsDiv, data.data);
-                } else {
-                    showError(resultsDiv, data.message);
-                }
-            } catch (error) {
-                showError(resultsDiv, 'Error connecting to the server. Please try again.');
-            }
-        }
-
-        async function verifySignature() {
-            const refInput = document.getElementById('referenceSignature');
-            const testInput = document.getElementById('testSignature');
-            const resultsDiv = document.getElementById('signatureResults');
-            
-            if (!refInput.files[0] || !testInput.files[0]) {
-                showError(resultsDiv, 'Please select both reference and test signature files');
-                return;
-            }
-
-            showLoading(resultsDiv, 'Verifying signature authenticity...');
-
-            const formData = new FormData();
-            formData.append('reference', refInput.files[0]);
-            formData.append('test', testInput.files[0]);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/signature`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    showSignatureResults(resultsDiv, data.data);
-                } else {
-                    showError(resultsDiv, data.message);
-                }
-            } catch (error) {
-                showError(resultsDiv, 'Error connecting to the server. Please try again.');
-            }
-        }
-
-        // Result display functions
-        function showLoading(element, message) {
-            element.innerHTML = `
-                <div class="fade-in">
-                    <div class="loading-spinner"></div>
-                    <p>${message}</p>
-                </div>
-            `;
-        }
-
-        function showError(element, message) {
-            element.innerHTML = `
-                <div class="fade-in">
-                    <i class="fas fa-exclamation-triangle error-icon"></i>
-                    <p class="error-message">${message}</p>
-                </div>
-            `;
-        }
-
-        function showImageResults(element, data) {
-            const score = (data.similarityScore * 100).toFixed(1);
-            const isGenuine = data.likelyGenuine;
-            
-            element.innerHTML = `
-                <div class="fade-in">
-                    <div class="score-container">
-                        <div class="score-header">
-                            <span>Similarity Score:</span>
-                            <span class="score-value ${isGenuine ? 'genuine' : 'forgery'}">${score}%</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar ${isGenuine ? 'genuine' : 'forgery'}" 
-                                 style="width: ${score}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="result-status ${isGenuine ? 'genuine' : 'forgery'}">
-                        <i class="fas ${isGenuine ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${isGenuine ? 'Likely Genuine' : 'Potential Forgery Detected'}
-                    </div>
-                    
-                    <div class="file-info">
-                        <p><strong>File:</strong> ${data.fileName}</p>
-                        ${data.errorMessage ? `<p class="error-detail"><strong>Error:</strong> ${data.errorMessage}</p>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        function showVideoResults(element, data) {
-            const score = (data.similarityScore * 100).toFixed(1);
-            const isGenuine = data.likelyGenuine;
-            
-            element.innerHTML = `
-                <div class="fade-in">
-                    <div class="score-container">
-                        <div class="score-header">
-                            <span>Authenticity Score:</span>
-                            <span class="score-value ${isGenuine ? 'genuine' : 'forgery'}">${score}%</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar ${isGenuine ? 'genuine' : 'forgery'}" 
-                                 style="width: ${score}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="result-status ${isGenuine ? 'genuine' : 'forgery'}">
-                        <i class="fas ${isGenuine ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${isGenuine ? 'Video appears authentic' : 'Potential manipulation detected'}
-                    </div>
-                    
-                    <div class="file-info">
-                        <p><strong>File:</strong> ${data.fileName}</p>
-                        ${data.errorMessage ? `<p class="error-detail"><strong>Error:</strong> ${data.errorMessage}</p>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        function showSignatureResults(element, data) {
-            const score = (data.similarityScore * 100).toFixed(1);
-            const isGenuine = data.likelyGenuine;
-            const threshold = 85;
-            
-            element.innerHTML = `
-                <div class="fade-in">
-                    <div class="score-container">
-                        <div class="score-header">
-                            <span>Match Confidence:</span>
-                            <span class="score-value ${isGenuine ? 'genuine' : 'forgery'}">${score}%</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar ${isGenuine ? 'genuine' : 'forgery'}" 
-                                 style="width: ${score}%"></div>
-                        </div>
-                        <p class="threshold-info">Threshold: ${threshold}% for genuine verification</p>
-                    </div>
-                    
-                    <div class="result-status ${isGenuine ? 'genuine' : 'forgery'}">
-                        <i class="fas ${isGenuine ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${isGenuine ? 'Signatures Match' : 'Signatures Do Not Match'}
-                    </div>
-                    
-                    <div class="file-info">
-                        <p><strong>Reference File:</strong> ${data.fileName}</p>
-                        ${data.errorMessage ? `<p class="error-detail"><strong>Error:</strong> ${data.errorMessage}</p>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        // Smooth scrolling for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
+    <!-- =================== SCRIPTS =================== -->
+    <script th:src="@{/script.js}"></script>
 </body>
 </html>

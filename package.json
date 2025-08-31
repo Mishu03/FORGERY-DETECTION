@@ -1,0 +1,25 @@
+{
+  "name": "forgery-detection",
+  "version": "1.0.0",
+  "description": "Detect forgery in images, videos, and signatures using OpenCV and algorithms",
+  "main": "test-image.js",
+  "type": "module",
+  "scripts": {
+    "start": "node test-image.js"
+  },
+  "dependencies": {
+    "form-data": "^4.0.4",
+    "node-fetch": "^3.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mishu03/FORGERY-DETECTION.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mishu03/FORGERY-DETECTION/issues"
+  },
+  "homepage": "https://github.com/Mishu03/FORGERY-DETECTION#readme"
+}
