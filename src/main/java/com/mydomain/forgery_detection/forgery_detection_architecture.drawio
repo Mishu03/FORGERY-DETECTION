@@ -1,0 +1,150 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="ForgeryDetectionSystem" name="Forgery Detection System">
+    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Client -->
+        <mxCell id="C" value="Client&#xa;(User uploads Signature, Image, or Video)" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#d4e1f5;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Application Layer -->
+        <mxCell id="A" value="Application Layer&#xa;(REST API / Unified Detection Controller)" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e0e0e0;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="120" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Client <-> API -->
+        <mxCell id="CA" edge="1" parent="1" source="C" target="A">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Signature Service -->
+        <mxCell id="S1" value="Signature Forgery Detection Service" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=#fff2cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="20" y="260" width="220" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="P1" value="Preprocessing" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SA" value="Structural Similarity Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SC" value="Stroke Consistency Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP" value="Pressure Pattern Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SF1" value="Score Fusion" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="D1" value="Signature Result DTO" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S1">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: API <-> Signature Service -->
+        <mxCell id="AtoS1" edge="1" parent="1" source="A" target="S1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S1toA" edge="1" parent="1" source="D1" target="A">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Image Service -->
+        <mxCell id="S2" value="Image Forgery Detection Service" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=#fff2cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="280" y="260" width="220" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="P2" value="Preprocessing" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EA" value="ELA Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NA" value="Noise Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MA" value="Metadata Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SF2" value="Score Fusion" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="D2" value="Image Result DTO" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S2">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: API <-> Image Service -->
+        <mxCell id="AtoS2" edge="1" parent="1" source="A" target="S2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S2toA" edge="1" parent="1" source="D2" target="A">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Video Service -->
+        <mxCell id="S3" value="Video Forgery Detection Service" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=#fff2cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="540" y="260" width="220" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="P3" value="Preprocessing" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FC" value="Frame Consistency Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MO" value="Motion Anomalies Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AV" value="Audio-Video Sync Analyzer" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SF3" value="Score Fusion" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="D3" value="Video Result DTO" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="S3">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: API <-> Video Service -->
+        <mxCell id="AtoS3" edge="1" parent="1" source="A" target="S3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S3toA" edge="1" parent="1" source="D3" target="A">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure -->
+        <mxCell id="INF" value="Infrastructure Layer" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=#e0e0e0;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="560" width="220" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="OP" value="OpenCV" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="INF">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AP" value="Apache Commons Imaging" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="INF">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FF" value="FFmpeg" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="INF">
+          <mxGeometry width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Services to Infra -->
+        <mxCell id="S1toOP" edge="1" parent="1" source="S1" target="OP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S2toOP" edge="1" parent="1" source="S2" target="OP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S2toAP" edge="1" parent="1" source="S2" target="AP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S3toOP" edge="1" parent="1" source="S3" target="OP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S3toFF" edge="1" parent="1" source="S3" target="FF">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

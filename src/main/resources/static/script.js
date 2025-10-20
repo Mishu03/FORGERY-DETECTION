@@ -1,10 +1,10 @@
 /* =========================
-   Forgery Detection Script (Dynamic Mirrors)
+   Forgery Detection Script - Updated for New Backend
 ========================= */
 
 const API_BASE = "/api/detection";
 
-// Elements
+// --- Elements ---
 const files = {
     image: document.getElementById("imageFile"),
     video: document.getElementById("videoFile"),
@@ -31,7 +31,7 @@ const mirrors = {
     signature: document.getElementById("signatureResultsMirror"),
 };
 
-// Buttons
+// --- Buttons ---
 const buttons = {
     image: document.getElementById("analyzeImageBtn"),
     video: document.getElementById("analyzeVideoBtn"),
@@ -46,7 +46,7 @@ function showPreview(file, previewElement) {
     reader.onload = (e) => {
         let html = "";
         if (file.type.startsWith("image/")) {
-            html = `<img src="${e.target.result}" alt="preview" style="max-width:100%;">`;
+            html = `<img src="${e.target.result}" alt="preview" style="max-width:100%; border-radius:12px;">`;
         } else if (file.type.startsWith("video/")) {
             html = `<video controls src="${e.target.result}" style="max-width:100%; border-radius:12px;"></video>`;
         } else {
@@ -58,7 +58,7 @@ function showPreview(file, previewElement) {
     reader.readAsDataURL(file);
 }
 
-// Auto-preview on file change
+// Auto-preview
 Object.keys(files).forEach((key) => {
     files[key].addEventListener("change", () => {
         if (files[key].files[0]) showPreview(files[key].files[0], previews[key]);
@@ -73,14 +73,8 @@ document.querySelectorAll(".dropzone").forEach((dz) => {
     const preview = dz.querySelector(".preview") || null;
 
     dz.addEventListener("click", () => input.click());
-
-    dz.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dz.classList.add("dragover");
-    });
-
+    dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("dragover"); });
     dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
-
     dz.addEventListener("drop", (e) => {
         e.preventDefault();
         dz.classList.remove("dragover");
@@ -93,58 +87,54 @@ document.querySelectorAll(".dropzone").forEach((dz) => {
 });
 
 /* =========================
-   Analysis Function
+   Analysis
 ========================= */
 async function analyzeFile(type) {
+    const btn = buttons[type];
+    btn.disabled = true;
+    results[type].innerHTML = "";
+    mirrors[type].innerHTML = "";
+
+    const showError = (msg) => {
+        results[type].innerHTML = `<p style="color:red;">${msg}</p>`;
+        btn.disabled = false;
+    };
+
+    let formData = new FormData();
+    let endpoint = "";
+
     if (type === "signature") {
-        if (!files.reference.files[0] || !files.test.files[0]) {
-            alert("Please upload both reference and test signatures!");
-            return;
-        }
-        const formData = new FormData();
+        if (!files.reference.files[0] || !files.test.files[0]) return showError("Please upload both reference and test signatures!");
         formData.append("referenceFile", files.reference.files[0]);
         formData.append("testFile", files.test.files[0]);
-
+        endpoint = `${API_BASE}/signature`;
         results.signature.innerHTML = `<div class="placeholder"><i class="fas fa-spinner fa-spin"></i><p>Verifying...</p></div>`;
-
-        try {
-            const res = await fetch(`${API_BASE}/signature`, { method: "POST", body: formData });
-            const data = await res.json();
-            displayResult("signature", data);
-        } catch (err) {
-            console.error(err);
-            results.signature.innerHTML = `<p style="color:red;">Error verifying signature.</p>`;
-        }
-        return;
+    } else {
+        const file = files[type].files[0];
+        if (!file) return showError(`Please upload a ${type} file!`);
+        formData.append("file", file);
+        endpoint = `${API_BASE}/${type}`;
+        results[type].innerHTML = `<div class="placeholder"><i class="fas fa-spinner fa-spin"></i><p>Analyzing...</p></div>`;
     }
-
-    const file = files[type].files[0];
-    if (!file) {
-        alert(`Please upload a ${type} first!`);
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    results[type].innerHTML = `<div class="placeholder"><i class="fas fa-spinner fa-spin"></i><p>Analyzing...</p></div>`;
 
     try {
-        const endpoint = type === "image" ? `${API_BASE}/image` : `${API_BASE}/video`;
         const res = await fetch(endpoint, { method: "POST", body: formData });
         const data = await res.json();
         displayResult(type, data);
     } catch (err) {
         console.error(err);
-        results[type].innerHTML = `<p style="color:red;">Error analyzing ${type}.</p>`;
+        showError(`Error analyzing ${type}.`);
+    } finally {
+        btn.disabled = false;
     }
 }
 
 /* =========================
-   Display Result
+   Display Results
 ========================= */
 function displayResult(type, data) {
     let html = '';
+    const timestamp = new Date().toLocaleTimeString();
 
     if (type === 'image') {
         html = `
@@ -155,6 +145,7 @@ function displayResult(type, data) {
             <p><strong>Noise Score:</strong> ${data.noiseAnalysisScore?.toFixed(2) ?? 0}</p>
             <p><strong>Metadata Score:</strong> ${data.metadataConsistencyScore?.toFixed(2) ?? 0}</p>
             <p><strong>Similarity Score:</strong> ${data.similarityScore?.toFixed(2) ?? 0}</p>
+            <p><strong>Forgery Probability:</strong> ${data.forgeryProbability?.toFixed(2) ?? 0}</p>
             <p><strong>Processing Time:</strong> ${data.processingTimeMs ?? 0} ms</p>
             ${data.elaHeatmapBase64 ? `<p><strong>ELA Heatmap:</strong></p><img src="data:image/png;base64,${data.elaHeatmapBase64}" style="max-width:100%; border-radius:12px;">` : ''}
         </div>`;
@@ -183,7 +174,7 @@ function displayResult(type, data) {
     }
 
     results[type].innerHTML = html;
-    mirrors[type].innerHTML = `<p><em>Latest Result:</em> ${data.message || data.decision || 'Result received'}</p>`;
+    mirrors[type].innerHTML = `<p><em>Latest Result (${timestamp}):</em> ${data.message || data.decision || 'Result received'}</p>`;
 }
 
 /* =========================

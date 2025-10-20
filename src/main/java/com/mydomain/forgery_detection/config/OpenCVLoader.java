@@ -1,5 +1,6 @@
 package com.mydomain.forgery_detection.config;
 
+import nu.pattern.OpenCV;
 import org.opencv.core.Core;
 import org.springframework.stereotype.Component;
 
@@ -10,11 +11,9 @@ public class OpenCVLoader {
 
     @PostConstruct
     public void init() {
-        System.load("C:\\Users\\msnai\\Downloads\\opencv\\build\\java\\x64\\opencv_java4120.dll");
-        System.out.println("Ã¢Å“â€¦ OpenCV loaded successfully!");
+        // Use OpenPnP's auto-loader to extract and load the correct native library
+        // This works cross-platform and avoids needing OPENCV_DLL_PATH
+        OpenCV.loadShared();
+        System.out.println("OpenCV loaded via OpenPnP. Version: " + Core.VERSION);
     }
 }
-
-
-
-

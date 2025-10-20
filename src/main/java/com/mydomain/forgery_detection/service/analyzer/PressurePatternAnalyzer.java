@@ -6,37 +6,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class PressurePatternAnalyzer {
 
-    /**
-     * Compute pressure pattern score from grayscale signature image.
-     * Darker pixels = higher pressure. Normalized 0-1.
-     */
-    public double analyze(double[] pressureData) {
-        if (pressureData == null || pressureData.length == 0) return 0.0;
-
-        double sum = 0.0;
-        for (double p : pressureData) sum += p;
-
-        // Normalize with log-scale to reduce extreme sensitivity
-        double avg = sum / pressureData.length;
-        double normalized = avg / 255.0;
-        return Math.min(1.0, Math.sqrt(normalized)); // sqrt to amplify smaller values
+    // Extract average pixel intensity as pressure
+    public double[] extractPressureData(Mat img) {
+        int rows = img.rows();
+        int cols = img.cols();
+        double[] data = new double[rows];
+        
+        for (int r = 0; r < rows; r++) {
+            double sumRow = 0;
+            for (int c = 0; c < cols; c++) {
+                sumRow += img.get(r, c)[0];
+            }
+            data[r] = sumRow / cols;
+        }
+        return data;
     }
 
-    /**
-     * Extract pressure data from grayscale signature image.
-     */
-    public double[] extractPressureData(Mat grayImg) {
-        int rows = grayImg.rows();
-        int cols = grayImg.cols();
-        double[] pressure = new double[rows * cols];
-
-        int idx = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                double pixel = grayImg.get(i, j)[0];
-                pressure[idx++] = 255 - pixel; // darker = higher pressure
-            }
+    // Aggregate "pressure" as average row intensity
+    public double analyze(double[] pressureData) {
+        double sum = 0;
+        for (double d : pressureData) {
+            sum += d;
         }
-        return pressure;
+        return sum / pressureData.length;
     }
 }

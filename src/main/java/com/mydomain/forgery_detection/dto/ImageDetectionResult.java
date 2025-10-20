@@ -1,7 +1,6 @@
 package com.mydomain.forgery_detection.dto;
 
 public class ImageDetectionResult extends DetectionResult {
-
     private double elaScore;
     private double noiseAnalysisScore;
     private double metadataConsistencyScore;

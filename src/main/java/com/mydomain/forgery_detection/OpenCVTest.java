@@ -1,20 +1,23 @@
 package com.mydomain.forgery_detection;
 
-import org.opencv.core.CvType;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.opencv.imgcodecs.Imgcodecs;
 
-@Component
-public class OpenCVTest implements CommandLineRunner {
+public class OpenCVTest {
+    static {
+        System.load("C:\\Users\\msnai\\Downloads\\opencv\\build\\java\\x64\\opencv_java4120.dll");
+    }
 
-    @Override
-    public void run(String... args) throws Exception {
-        Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
-        System.out.println("OpenCV Test Matrix:\n" + mat.dump());
+    public static void main(String[] args) {
+        String path = "A:\\MJR\\forgery-detection\\test-data\\image.jpg";
+        Mat img = Imgcodecs.imread(path);
+
+        if (img.empty()) {
+            System.out.println("Failed to read image! Check path or format.");
+        } else {
+            System.out.println("Image read successfully!");
+            System.out.println("Cols: " + img.cols() + ", Rows: " + img.rows() + ", Channels: " + img.channels());
+        }
     }
 }
-
-
-
-

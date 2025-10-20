@@ -103,6 +103,20 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.6</version>
+        </dependency>
+
+        <!-- H2 in-memory DB for dev profile -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -122,6 +136,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Use env var so builds are portable; optional if System.loadLibrary works -->
+                    <!-- <jvmArguments>-Djava.library.path=${env:OPENCV_DLL_DIR}</jvmArguments> -->
+                </configuration>
             </plugin>
         </plugins>
     </build>
