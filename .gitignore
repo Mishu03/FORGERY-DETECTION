@@ -1,10 +1,14 @@
+# -------------------------------
+# General
+# -------------------------------
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
-### STS ###
+# -------------------------------
+# Java / IDEs
+# -------------------------------
+# Eclipse / STS
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +17,13 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +33,30 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# -------------------------------
+# VS Code
+# -------------------------------
 .vscode/
+node_modules/
+
+# -------------------------------
+# Python
+# -------------------------------
+ml-image-detector/__pycache__/
+ml-image-detector/*.pyc
+ml-image-detector/tf_env/
+ml-image-detector/*.h5
+ml-image-detector/*.pth
+
+# -------------------------------
+# OS generated files
+# -------------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------------
+# Line endings (optional, for Windows)
+# -------------------------------
+* text=auto
+*.sh eol=lf
+*.bat eol=crlf
