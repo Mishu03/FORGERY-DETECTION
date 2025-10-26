@@ -60,3 +60,7 @@ Thumbs.db
 * text=auto
 *.sh eol=lf
 *.bat eol=crlf
+
+# Python virtual env
+tf_env/
+ml-image-detector/tf_env/
